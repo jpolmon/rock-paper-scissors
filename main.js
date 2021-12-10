@@ -1,3 +1,5 @@
+let select = document.getElementById("num");
+
 let canvas = document.getElementById("canvas");
 
 let context = canvas.getContext("2d")
@@ -77,51 +79,7 @@ let getDistance = function(xpos1, ypos1, xpos2, ypos2) {
   return Math.sqrt(Math.pow(xpos2 - xpos1, 2) + Math.pow(ypos2 - ypos1, 2));
 }
 
-let radius = 30;
-let numGroups = 7;
-let numCircles = numGroups * 3;
 let circles = [];
-
-let randNum = function(min, max) {
-  return Math.random() * (max - min) + min;
-}
-
-let generateStartPoints = function() {
-  let points = [];
-  for (let i = 0; i < numCircles; i++) {
-    let thisPoint = new Point(randNum(radius, (window_width - radius)),randNum(radius, (window_height - radius)))
-    if (points) {
-      for (const point of points) {
-        if (getDistance(thisPoint.xpos, thisPoint.ypos, point.xpos, point.ypos) <= ((2 * radius) + 50)) {
-          while (getDistance(thisPoint.xpos, thisPoint.ypos, point.xpos, point.ypos) <= ((2 * radius) + 50)) {
-            thisPoint.xpos = randNum(radius, (window_width - radius));
-            thisPoint.ypos = randNum(radius, (window_height - radius));
-          } 
-        }
-      }
-    }
-    points.push(thisPoint);
-  }
-  console.log(points);
-  return points;
-}
-
-// generateStartPoints(numCircles);
-
-let pointIndex = 0;
-
-for (let i = 0; i < numGroups; i++) {
-  let points = generateStartPoints(numCircles);
-  let new_rock = new Circle(points[pointIndex].xpos, points[pointIndex].ypos, radius, "red", "R", 0.5, "rock");
-  pointIndex++;
-  let new_paper = new Circle(points[pointIndex].xpos, points[pointIndex].ypos, radius, "purple", "P", 0.5, "paper");
-  pointIndex++;
-  let new_scissors = new Circle(points[pointIndex].xpos, points[pointIndex].ypos, radius, "black", "S", 0.5, "scissors");
-  pointIndex++;
-  circles.push(new_rock);
-  circles.push(new_paper);
-  circles.push(new_scissors);
-}
 
 let updateCircle = function() {
   requestAnimationFrame(updateCircle);
@@ -185,5 +143,64 @@ let updateCircle = function() {
   }
 }
 
-updateCircle();
+let game = function() {
+
+  let numGroups = select.options[select.selectedIndex].value;
+  console.log('ran');
+  console.log(numGroups);
+  let radius = 30;
+  let numCircles = numGroups * 3;
+    
+  let randNum = function(min, max) {
+    return Math.random() * (max - min) + min;
+  }
+  
+  let generateStartPoints = function() {
+    let points = [];
+    for (let i = 0; i < numCircles; i++) {
+      let thisPoint = new Point(randNum(radius, (window_width - radius)),randNum(radius, (window_height - radius)))
+      if (points) {
+        for (const point of points) {
+          if (getDistance(thisPoint.xpos, thisPoint.ypos, point.xpos, point.ypos) <= ((2 * radius) + 100)) {
+            for (const p of points) {
+              while (getDistance(thisPoint.xpos, thisPoint.ypos, p.xpos, p.ypos) <= ((2 * radius) + 100)) {
+                thisPoint.xpos = randNum(radius, (window_width - radius));
+                thisPoint.ypos = randNum(radius, (window_height - radius));
+              }
+            } 
+          }
+        }
+      }
+      points.push(thisPoint);
+    }
+    console.log(points);
+    return points;
+  }
+  
+  let pointIndex = 0;
+  
+  for (let i = 0; i < numGroups; i++) {
+    let points = generateStartPoints(numCircles);
+    let new_rock = new Circle(points[pointIndex].xpos, points[pointIndex].ypos, radius, "red", "R", 0.5, "rock");
+    pointIndex++;
+    let new_paper = new Circle(points[pointIndex].xpos, points[pointIndex].ypos, radius, "purple", "P", 0.5, "paper");
+    pointIndex++;
+    let new_scissors = new Circle(points[pointIndex].xpos, points[pointIndex].ypos, radius, "black", "S", 0.5, "scissors");
+    pointIndex++;
+    circles.push(new_rock);
+    circles.push(new_paper);
+    circles.push(new_scissors);
+  }
+  
+  updateCircle(); 
+}
+
+
+
+
+
+document.getElementById("startBtn").onclick = function () {
+  console.log('clicked');
+  game();
+}
 
